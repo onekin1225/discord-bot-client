@@ -4,7 +4,6 @@ const express = require("express");
 const app = express();
 
 app.use(bodyParser());
-app.use("/assets", express.static("assets"));
 app.use("/src", express.static("src"));
 
 app.use("/api", (req, res) => {
@@ -12,13 +11,26 @@ app.use("/api", (req, res) => {
 	req.headers.origin = "discord.com";
 	delete req.headers.referer;
 
+	fetchAndResponse(`https://discord.com/api${req.path}`, req,res);
+});
+
+
+app.use("/assets/", (req, res) => {
+	req.headers.host = "discord.com";
+	req.headers.origin = "discord.com";
+	delete req.headers.referer;
+
+	fetchAndResponse(`https://discord.com/assets${req.path}`, req, res);
+});
+
+function fetchAndResponse(url, req, res) {
 	var { headers, method, body } = req;
 
 	if (method === "GET") {
 		body = undefined;
 	}
 
-	fetch(`https://discord.com/api${req.path}`, {
+	fetch(url, {
 		headers,
 		method,
 		body: JSON.stringify(body),
@@ -37,14 +49,14 @@ app.use("/api", (req, res) => {
 				res.header(header[0], header[1]);
 			}
 
-			var text = await r.text();
-			res.status(r.status).send(text);
+			var buffer = await r.buffer();
+			res.status(r.status).send(buffer);
 		})
 		.catch((r) => {
 			console.log(r);
 			res.status(500);
 		});
-});
+}
 
 app.use("*", (req, res) => {
 	res.sendFile(__dirname + "/index.html");
