@@ -5,6 +5,7 @@ const app = express();
 
 app.use(bodyParser());
 app.use("/assets", express.static("assets"));
+app.use("/src", express.static("src"));
 
 app.use("/api", (req, res) => {
 	req.headers.host = "discord.com";
