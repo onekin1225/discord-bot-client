@@ -14,7 +14,7 @@ app.use("/api", (req, res) => {
 	fetchAndResponse(`https://discord.com/api${req.path}`, req,res);
 });
 
-app.use(["/assets", "/src"], (req, res) => {
+app.use(["/assets"], (req, res) => {
 	req.headers.host = "discord.com";
 	req.headers.origin = "discord.com";
 	delete req.headers.referer;
