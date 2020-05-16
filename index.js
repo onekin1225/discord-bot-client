@@ -2,6 +2,7 @@ const fetch = require("node-fetch");
 const bodyParser = require("body-parser");
 const express = require("express");
 const app = express();
+const config = require("./config.json");
 
 app.use(bodyParser());
 app.use("/src", express.static("src"));
@@ -11,7 +12,11 @@ app.use("/api", (req, res) => {
 	req.headers.origin = "discord.com";
 	delete req.headers.referer;
 
-	fetchAndResponse(`https://discord.com/api${req.path}`, req,res);
+	if (req.path === "/token") {
+		res.status(200).send(Buffer.from(config.token));
+	} else {
+		fetchAndResponse(`https://discord.com/api${req.path}`, req, res);
+	}
 });
 
 app.use(["/assets"], (req, res) => {
